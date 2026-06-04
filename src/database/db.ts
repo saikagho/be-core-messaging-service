@@ -1,10 +1,9 @@
-import pg from "pg";
-import { env } from "../config/env.js";
-import { logger } from "../utils/logger.js";
-import { PoolHealth, TransactionClient } from "./types.js";
+import pg from 'pg';
+import { env } from '../config/env.js';
+import { logger } from '../utils/logger.js';
+import { PoolHealth, TransactionClient } from './types.js';
 
 const { Pool } = pg;
-
 
 // ─── Pool Configuration ───────────────────────────────────────────────────────
 
@@ -26,7 +25,12 @@ const POOL_CONFIG: pg.PoolConfig = {
   query_timeout: env.DATABASE_QUERY_TIMEOUT,
 
   // SSL — always enforce in production
-  ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : env.DATABASE_SSL ? { rejectUnauthorized: false } : false,
+  ssl:
+    env.NODE_ENV === 'production'
+      ? { rejectUnauthorized: true }
+      : env.DATABASE_SSL
+        ? { rejectUnauthorized: false }
+        : false,
 
   // Keep-alive prevents silent connection drops from firewalls / NAT
   keepAlive: true,
@@ -70,10 +74,10 @@ function createPool(): pg.Pool {
             SET lock_timeout               = 10000;
             SET idle_in_transaction_session_timeout = ${POOL_CONFIG.idleTimeoutMillis};
             SET search_path                = public;
-        `
+        `,
       )
       .catch((err) =>
-        logger.error('PostgreSQL: failed to apply session hardening settings.', { err })
+        logger.error('PostgreSQL: failed to apply session hardening settings.', { err }),
       );
   });
 
@@ -114,7 +118,7 @@ function createPool(): pg.Pool {
  */
 async function query<T extends pg.QueryResultRow = Record<string, unknown>>(
   text: string,
-  params?: unknown[]
+  params?: unknown[],
 ): Promise<pg.QueryResult<T>> {
   const start = Date.now();
   try {
@@ -156,9 +160,11 @@ async function transaction<T>(fn: (client: TransactionClient) => Promise<T>): Pr
     await client.query('COMMIT');
     return result;
   } catch (err) {
-    await client.query('ROLLBACK').catch((rollbackErr: Error) =>
-      logger.error('PostgreSQL: ROLLBACK failed.', { rollbackErr: rollbackErr.message })
-    );
+    await client
+      .query('ROLLBACK')
+      .catch((rollbackErr: Error) =>
+        logger.error('PostgreSQL: ROLLBACK failed.', { rollbackErr: rollbackErr.message }),
+      );
     throw err;
   } finally {
     client.release();
@@ -206,8 +212,12 @@ async function shutdown(): Promise<void> {
 }
 
 // Register once — safe for tests and hot-reload because we guard with _isShuttingDown
-process.once('SIGINT', () => shutdown().catch((err) => logger.error('Pool shutdown error', { err })));
-process.once('SIGTERM', () => shutdown().catch((err) => logger.error('Pool shutdown error', { err })));
+process.once('SIGINT', () =>
+  shutdown().catch((err) => logger.error('Pool shutdown error', { err })),
+);
+process.once('SIGTERM', () =>
+  shutdown().catch((err) => logger.error('Pool shutdown error', { err })),
+);
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 

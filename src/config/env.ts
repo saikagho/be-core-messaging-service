@@ -6,7 +6,7 @@ import { z } from 'zod';
 dotenv.config();
 
 const envSchema = z.object({
-  APP_NAME: z.string().default("be-core-messaging-service"),
+  APP_NAME: z.string().default('be-core-messaging-service'),
   PORT: z.coerce.number().default(3000),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   API_PREFIX: z.string().default('/api/v1'),
@@ -14,22 +14,22 @@ const envSchema = z.object({
   RATE_LIMIT_MAX: z.coerce.number().default(100),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(900000),
   JWT_SECRET: z.string().default('super-secret-jwt-key'),
-  
+
   // Google credentials
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CALLBACK_URL: z.string().optional(),
-  
+
   // Github credentials
   GITHUB_CLIENT_ID: z.string().optional(),
   GITHUB_CLIENT_SECRET: z.string().optional(),
   GITHUB_CALLBACK_URL: z.string().optional(),
-  
+
   // Facebook credentials
   FACEBOOK_CLIENT_ID: z.string().optional(),
   FACEBOOK_CLIENT_SECRET: z.string().optional(),
   FACEBOOK_CALLBACK_URL: z.string().optional(),
-  
+
   // Database variables
   DATABASE_HOST: z.string().nonoptional(),
   DATABASE_PORT: z.coerce.number().default(5432),
@@ -42,7 +42,7 @@ const envSchema = z.object({
   DATABASE_IDLE_TIMEOUT: z.coerce.number().default(30000),
   DATABASE_CONNECTION_TIMEOUT: z.coerce.number().default(5000),
   DATABASE_STATEMENT_TIMEOUT: z.coerce.number().default(30000),
-  DATABASE_QUERY_TIMEOUT: z.coerce.number().default(30000)
+  DATABASE_QUERY_TIMEOUT: z.coerce.number().default(30000),
 });
 
 const _env = envSchema.safeParse(process.env);

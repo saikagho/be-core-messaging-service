@@ -1,6 +1,4 @@
-import pg from "pg";
-
-export interface QueryResult<T extends pg.QueryResultRow = Record<string, unknown>> extends pg.QueryResult<T> {}
+import pg from 'pg';
 
 export type TransactionClient = pg.PoolClient;
 
